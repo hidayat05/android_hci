@@ -19,14 +19,16 @@ class MainViewModel(private val apiService: ApiService) : BaseViewModel() {
     val listSection = MutableLiveData<List<Section>>()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun getHomeData() = viewModelScope.launch {
-        isLoading.postValue(true)
-        when (val result = apiService.getHomeData().awaitResult()) {
-            is Result.Ok -> {
-                isLoading.postValue(false)
-                listSection.postValue(result.value.data)
+    fun getHomeData() {
+        viewModelScope.launch {
+            isLoading.postValue(true)
+            when (val result = apiService.getHomeData().awaitResult()) {
+                is Result.Ok -> {
+                    isLoading.postValue(false)
+                    listSection.postValue(result.value.data)
+                }
+                else -> result.onErrorResponse()
             }
-            else -> result.onErrorResponse()
         }
     }
 
